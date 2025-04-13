@@ -2,12 +2,14 @@ import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthProvider';
 
-// Import role-specific components (to be created later)
+// Import role-specific components
 const StudentDashboard = React.lazy(() => import('../components/dashboard/StudentDashboard'));
 const TeacherDashboard = React.lazy(() => import('../components/dashboard/TeacherDashboard'));
 const AdminDashboard = React.lazy(() => import('../components/dashboard/AdminDashboard'));
+const StudentActivities = React.lazy(() => import('../components/dashboard/StudentActivities'));
+const TeacherActivities = React.lazy(() => import('../components/dashboard/TeacherActivities'));
 
-// Import other dashboard pages (to be created later)
+// Import other dashboard pages
 const Profile = React.lazy(() => import('../components/dashboard/Profile'));
 const NotFound = React.lazy(() => import('./NotFound'));
 
@@ -62,6 +64,14 @@ const Dashboard: React.FC = () => {
                 >
                   Dashboard
                 </a>
+                {(user.role === 'STUDENT' || user.role === 'TEACHER') && (
+                  <a
+                    href="/dashboard/activities"
+                    className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  >
+                    Activities
+                  </a>
+                )}
                 <a
                   href="/dashboard/profile"
                   className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
@@ -90,10 +100,18 @@ const Dashboard: React.FC = () => {
       {/* Main Content */}
       <div className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <React.Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+          <React.Suspense fallback={<div className="flex items-center justify-center h-64">Loading...</div>}>
             <Routes>
               <Route path="/" element={renderDashboard()} />
               <Route path="/profile" element={<Profile />} />
+              <Route 
+                path="/activities" 
+                element={
+                  user.role === 'STUDENT' ? <StudentActivities /> : 
+                  user.role === 'TEACHER' ? <TeacherActivities /> : 
+                  <Navigate to="/dashboard" />
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </React.Suspense>
